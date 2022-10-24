@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import ValidateForm from 'src/app/helpers/validateform';
 
 @Component({
   selector: 'app-signup',
@@ -30,4 +31,20 @@ export class SignupComponent implements OnInit {
     this.isText ? this.eyeIcon = 'fa-eye' : this.eyeIcon = 'fa-eye-slash';
     this.isText ? this.type = 'text' : this.type = 'password';
   }
+
+  onSignup() {
+    if(this.signUpForm.valid) {
+      // perform logic for signup
+
+      console.log(this.signUpForm.value);
+    } else {
+      // logic for throwing error
+      ValidateForm.validateAllFormFields(this.signUpForm);
+      alert("Your form is invalid")
+
+    }
+  }
+
+ 
+
 }
