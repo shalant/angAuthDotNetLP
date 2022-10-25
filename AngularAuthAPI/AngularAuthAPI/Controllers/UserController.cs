@@ -4,6 +4,8 @@ using AngularAuthAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AngularAuthAPI.Controllers
 {
@@ -41,6 +43,20 @@ namespace AngularAuthAPI.Controllers
             if (userObj == null)
                 return BadRequest();
 
+            // check username
+            if (await CheckUserNameExistAsync(userObj.UserName))
+                return BadRequest(new { Message = "Username already exists" });
+
+            // check email
+            if (await CheckEmailExistAsync(userObj.UserName))
+                return BadRequest(new { Message = "Email already exists" });
+
+            // check password strength
+            var pass = CheckPasswordStrength(userObj.Password);
+            if (string.IsNullOrEmpty(pass))
+                return BadRequest(new { Message = pass });
+
+
             userObj.Password = PasswordHasher.HashPassword(userObj.Password);
             userObj.Role = "User";
             userObj.Token = "";
@@ -50,6 +66,29 @@ namespace AngularAuthAPI.Controllers
             {
                 Message = "User Registered"
             });
+        }
+
+        private async Task<Boolean> CheckUserNameExistAsync(string username)
+        {
+            return await _authContext.Users.AnyAsync(x => x.UserName == username);
+        }
+
+        private async Task<Boolean> CheckEmailExistAsync(string email)
+        {
+            return await _authContext.Users.AnyAsync(x => x.Email == email);
+        }
+
+        private string CheckPasswordStrength(string password)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (password.Length < 8)
+                sb.Append("Minimum password length should be 8" + Environment.NewLine);
+            if (!(Regex.IsMatch(password, "[a-z]") && Regex.IsMatch(password, "[A-Z]") && Regex.IsMatch(password, "[0-9]")))
+                sb.Append("Password should be Alpha-numberic" + Environment.NewLine);
+            if (!Regex.IsMatch(password, "[<,>,@,!,#,$,%,^,&,*,(,),`,~,/,?,[,{,],},-,-,=]"))
+                sb.Append("Password should contain special characters" + Environment.NewLine);
+            return sb.ToString();
+
         }
     }
 }

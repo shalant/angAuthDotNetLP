@@ -48,8 +48,6 @@ export class SignupComponent implements OnInit {
             alert(err?.error.message)
           })
         })
-
-      console.log(this.signUpForm.value);
     } else {
       // logic for throwing error
       ValidateForm.validateAllFormFields(this.signUpForm);
