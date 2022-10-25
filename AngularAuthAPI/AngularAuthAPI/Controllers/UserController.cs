@@ -8,17 +8,17 @@ namespace AngularAuthAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class User : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly AppDbContext _authContext;
 
-        public User(AppDbContext appDbContext)
+        public UserController(AppDbContext appDbContext)
         {
             _authContext = appDbContext;
         }
 
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] User userObj)
+        public async Task<IActionResult> Authenticate([FromBody] UserController userObj)
         {
             if(userObj == null)
                 return BadRequest();
